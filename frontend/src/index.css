@@ -1,0 +1,41 @@
+@import "tailwindcss";
+.panel-title {
+  @apply text-xl font-semibold text-green-300;
+}
+
+.panel-sub {
+  @apply mt-1 text-slate-400;
+}
+@keyframes glow {
+  0% { box-shadow: 0 0 10px rgba(255,0,0,0.3); }
+  50% { box-shadow: 0 0 25px rgba(255,0,0,0.6); }
+  100% { box-shadow: 0 0 10px rgba(255,0,0,0.3); }
+}
+
+@keyframes scan {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 0% 100%; }
+}
+
+.animate-glow {
+  animation: glow 2.5s infinite;
+}
+
+.scan-lines {
+  background-image: linear-gradient(
+    rgba(255,255,255,0.03) 1px,
+    transparent 1px
+  );
+  background-size: 100% 4px;
+  animation: scan 6s linear infinite;
+}
+.panel-title {
+  @apply text-xl font-semibold text-emerald-300;
+}
+
+.panel-sub {
+  @apply mt-1 text-slate-400;
+}
+
+
+

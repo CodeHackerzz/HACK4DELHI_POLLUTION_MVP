@@ -1,0 +1,226 @@
+import { useEffect, useState } from "react";
+import CityMap from "../components/CityMap";
+
+/* ================= AQI SEVERITY ENGINE ================= */
+
+function getAQIMeta(aqi) {
+  if (aqi <= 50) return { label: "GOOD", glow: "from-green-400 to-green-600" };
+  if (aqi <= 100) return { label: "SATISFACTORY", glow: "from-emerald-400 to-emerald-600" };
+  if (aqi <= 200) return { label: "MODERATE", glow: "from-yellow-400 to-orange-400" };
+  if (aqi <= 300) return { label: "POOR", glow: "from-orange-500 to-red-500" };
+  if (aqi <= 400) return { label: "VERY POOR", glow: "from-red-600 to-red-800" };
+  return { label: "SEVERE", glow: "from-red-900 to-black" };
+}
+
+/* ================= POLICY ENGINE ================= */
+
+function generatePolicy(pollution) {
+  const policies = [];
+
+  if (pollution.pm25 > 120) {
+    policies.push({
+      level: "WARNING",
+      title: "Restrict Construction Activities",
+      action: "Suspend non-essential construction work",
+      authority: "Municipal Corporation",
+      reason: "PM2.5 concentration crossed safe limit",
+    });
+  }
+
+  if (pollution.pm10 > 150) {
+    policies.push({
+      level: "WARNING",
+      title: "Enforce Road Dust Control",
+      action: "Deploy water sprinklers & mechanical sweeping",
+      authority: "Urban Transport Department",
+      reason: "Rising PM10 dust emissions",
+    });
+  }
+
+  if (pollution.aqi > 200) {
+    policies.push({
+      level: "CRITICAL",
+      title: "Public Health Advisory",
+      action: "Issue advisory for children & elderly",
+      authority: "Health Department",
+      reason: "AQI reached unhealthy levels",
+    });
+  }
+
+  if (policies.length === 0) {
+    policies.push({
+      level: "NORMAL",
+      title: "Air Quality Stable",
+      action: "Continue routine monitoring",
+      authority: "Pollution Control Board",
+      reason: "All parameters within acceptable range",
+    });
+  }
+
+  return policies;
+}
+
+/* ================= DASHBOARD ================= */
+
+export default function Dashboard() {
+  const [pollution, setPollution] = useState({
+    city: "Delhi",
+    pm25: 0,
+    pm10: 0,
+    no2: 0,
+    aqi: 0,
+  });
+
+  const [lastUpdated, setLastUpdated] = useState("");
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/pollution/live?city=Delhi")
+      .then((res) => res.json())
+      .then((data) => {
+        const aqi = Math.round((data.pm25 + data.pm10) / 2);
+
+        setPollution({
+          city: data.city,
+          pm25: data.pm25,
+          pm10: data.pm10,
+          no2: data.no2,
+          aqi,
+        });
+
+        setLastUpdated(new Date().toLocaleString());
+      })
+      .catch(console.error);
+  }, []);
+
+  const policies = generatePolicy(pollution);
+  const aqiMeta = getAQIMeta(pollution.aqi);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-black text-white px-10 py-12">
+
+      {/* HEADER */}
+      <div className="mb-16">
+        <p className="text-emerald-400 tracking-widest mb-3 flex items-center gap-2">
+          <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+          LIVE CITY MONITORING
+        </p>
+
+        <h1 className="text-6xl font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+          Ward-Wise Pollution Command Center
+        </h1>
+
+        <p className="text-slate-400 mt-4">
+          Digital Twin • AQICN Real Data • Policy Intelligence
+        </p>
+
+        <p className="text-xs text-slate-500 mt-2">
+          Last Updated: {lastUpdated}
+        </p>
+      </div>
+
+      {/* KPI CARDS */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-20">
+        <MetricCard title="AQI" value={pollution.aqi} unit="" status={aqiMeta.label} glow={aqiMeta.glow} />
+        <MetricCard title="PM2.5" value={pollution.pm25} unit="µg/m³" status="LIVE" glow="from-yellow-400 to-orange-500" />
+        <MetricCard title="PM10" value={pollution.pm10} unit="µg/m³" status="LIVE" glow="from-orange-500 to-red-500" />
+        <MetricCard title="NO₂" value={pollution.no2} unit="ppb" status="LIVE" glow="from-cyan-400 to-blue-500" />
+      </div>
+
+      {/* PANELS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+        {/* CITY DIGITAL TWIN */}
+        <div className="md:col-span-2 rounded-3xl bg-slate-900/60 backdrop-blur-xl p-8 border border-slate-700">
+          <h2 className="text-xl font-semibold text-emerald-400 mb-2">
+            🗺️ City Digital Twin
+          </h2>
+          <p className="text-slate-400 mb-6">
+            Ward-level pollution visualization
+          </p>
+
+          <div className="h-[420px] rounded-2xl overflow-hidden border border-slate-700">
+            <CityMap />
+          </div>
+        </div>
+
+        {/* POLICY INTELLIGENCE */}
+        <div className="rounded-3xl bg-slate-900/60 backdrop-blur-xl p-8 border border-slate-700">
+          <h2 className="text-xl font-semibold text-cyan-400 mb-6">
+            🚨 Policy Intelligence
+          </h2>
+
+          <div className="space-y-6">
+            {policies.map((p, i) => (
+              <div
+                key={i}
+                className="relative bg-slate-800 rounded-2xl border border-slate-700 p-6 overflow-hidden"
+              >
+
+                {/* SEVERITY STRIP */}
+                <div
+                  className={`absolute left-0 top-0 h-full w-1 ${
+                    p.level === "CRITICAL"
+                      ? "bg-red-600"
+                      : p.level === "WARNING"
+                      ? "bg-yellow-400"
+                      : "bg-green-500"
+                  }`}
+                />
+
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-lg font-semibold text-white">
+                    {p.title}
+                  </h3>
+
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full ${
+                      p.level === "CRITICAL"
+                        ? "bg-red-600/20 text-red-400"
+                        : p.level === "WARNING"
+                        ? "bg-yellow-400/20 text-yellow-300"
+                        : "bg-green-500/20 text-green-400"
+                    }`}
+                  >
+                    {p.level}
+                  </span>
+                </div>
+
+                <div className="text-sm text-slate-300 space-y-2">
+                  <p>🛠 <b>Action:</b> {p.action}</p>
+                  <p>🏛 <b>Authority:</b> {p.authority}</p>
+                  <p className="text-xs text-slate-400">
+                    Triggered because {p.reason}
+                  </p>
+                </div>
+
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+/* ================= KPI CARD ================= */
+
+function MetricCard({ title, value, unit, status, glow }) {
+  return (
+    <div className={`relative rounded-3xl p-[2px] bg-gradient-to-r ${glow}`}>
+      <div className="rounded-3xl bg-slate-900/80 backdrop-blur-xl p-6 h-full">
+        <div className="flex justify-between items-center mb-6">
+          <p className="text-slate-400">{title}</p>
+          <span className="text-xs px-3 py-1 rounded-full bg-white/10 text-white">
+            {status}
+          </span>
+        </div>
+
+        <div className="text-5xl font-bold text-white">
+          {value}
+          <span className="text-xl text-slate-400 ml-2">{unit}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
