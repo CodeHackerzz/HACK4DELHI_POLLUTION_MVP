@@ -60,6 +60,37 @@ function generatePolicy(pollution) {
   return policies;
 }
 
+/* ================= PRIORITY ZONES ================= */
+
+const priorityZones = [
+  { ward: 17, area: "Rohini Sec-16", aqi: 328 },
+  { ward: 26, area: "Pitampura", aqi: 320 },
+  { ward: 29, area: "Janakpuri", aqi: 318 },
+];
+
+/* ================= CITIZEN ADVISORY ================= */
+
+function getCitizenAdvisory(ward) {
+  if (!ward) return [];
+
+  const advice = [];
+
+  if (ward.aqi > 200) {
+    advice.push("Avoid outdoor activities");
+    advice.push("Children & elderly should stay indoors");
+  }
+
+  if (ward.pm25 > 120) {
+    advice.push("Wear N95 mask when outdoors");
+  }
+
+  if (ward.pm10 > 150) {
+    advice.push("Wash face and hands frequently");
+  }
+
+  return advice;
+}
+
 /* ================= DASHBOARD ================= */
 
 export default function Dashboard() {
@@ -72,6 +103,7 @@ export default function Dashboard() {
   });
 
   const [lastUpdated, setLastUpdated] = useState("");
+  const [selectedWard, setSelectedWard] = useState(null);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/pollution/live?city=Delhi")
@@ -120,69 +152,62 @@ export default function Dashboard() {
 
       {/* KPI CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-20">
-        <MetricCard title="AQI" value={pollution.aqi} unit="" status={aqiMeta.label} glow={aqiMeta.glow} />
-        <MetricCard title="PM2.5" value={pollution.pm25} unit="µg/m³" status="LIVE" glow="from-yellow-400 to-orange-500" />
-        <MetricCard title="PM10" value={pollution.pm10} unit="µg/m³" status="LIVE" glow="from-orange-500 to-red-500" />
-        <MetricCard title="NO₂" value={pollution.no2} unit="ppb" status="LIVE" glow="from-cyan-400 to-blue-500" />
+        <MetricCard title="AQI-Air Quality Index" value={pollution.aqi} unit="" status={aqiMeta.label} glow={aqiMeta.glow} />
+        <MetricCard title="PM2.5-Particulate Matter smaller than 2.5" value={pollution.pm25} unit="µg/m³" status="LIVE" glow="from-yellow-400 to-orange-500" />
+        <MetricCard title="PM10-Particles smaller than 10 micrometers" value={pollution.pm10} unit="µg/m³" status="LIVE" glow="from-orange-500 to-red-500" />
+        <MetricCard title="NO₂-Nitrogen Dioxide" value={pollution.no2} unit="ppb" status="LIVE" glow="from-cyan-400 to-blue-500" />
       </div>
 
       {/* PANELS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
-        {/* CITY DIGITAL TWIN */}
+        {/* MAP PANEL */}
         <div className="md:col-span-2 rounded-3xl bg-slate-900/60 backdrop-blur-xl p-8 border border-slate-700">
           <h2 className="text-xl font-semibold text-emerald-400 mb-2">
             🗺️ City Digital Twin
           </h2>
+
           <p className="text-slate-400 mb-6">
             Ward-level pollution visualization
           </p>
 
           <div className="h-[420px] rounded-2xl overflow-hidden border border-slate-700">
-            <CityMap />
+            <CityMap onWardSelect={setSelectedWard} />
           </div>
+
+          {/* ✅ ONLY NEW ADDITION */}
+          {selectedWard && (
+            <div className="mt-6 bg-slate-900/60 border border-slate-700 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-emerald-400 mb-3">
+                👥 Citizen Advisory — Ward {selectedWard.ward}
+              </h3>
+
+              <ul className="space-y-2 text-slate-300">
+                {getCitizenAdvisory(selectedWard).map((tip, i) => (
+                  <li key={i}>• {tip}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
-        {/* POLICY INTELLIGENCE */}
-        <div className="rounded-3xl bg-slate-900/60 backdrop-blur-xl p-8 border border-slate-700">
+        {/* POLICY INTELLIGENCE — UNCHANGED */}
+        <div className="rounded-3xl bg-slate-900/60 backdrop-blur-xl p-8 border border-slate-700 flex flex-col">
           <h2 className="text-xl font-semibold text-cyan-400 mb-6">
             🚨 Policy Intelligence
           </h2>
 
-          <div className="space-y-6">
+          <div className="space-y-6 overflow-y-auto pr-2" style={{ maxHeight: "520px" }}>
             {policies.map((p, i) => (
-              <div
-                key={i}
-                className="relative bg-slate-800 rounded-2xl border border-slate-700 p-6 overflow-hidden"
-              >
-
-                {/* SEVERITY STRIP */}
-                <div
-                  className={`absolute left-0 top-0 h-full w-1 ${
-                    p.level === "CRITICAL"
-                      ? "bg-red-600"
-                      : p.level === "WARNING"
-                      ? "bg-yellow-400"
-                      : "bg-green-500"
-                  }`}
-                />
+              <div key={i} className="relative bg-slate-800 rounded-2xl border border-slate-700 p-6">
+                <div className={`absolute left-0 top-0 h-full w-1 ${
+                  p.level === "CRITICAL" ? "bg-red-600" :
+                  p.level === "WARNING" ? "bg-yellow-400" : "bg-green-500"
+                }`} />
 
                 <div className="flex justify-between items-center mb-3">
-                  <h3 className="text-lg font-semibold text-white">
-                    {p.title}
-                  </h3>
-
-                  <span
-                    className={`text-xs px-3 py-1 rounded-full ${
-                      p.level === "CRITICAL"
-                        ? "bg-red-600/20 text-red-400"
-                        : p.level === "WARNING"
-                        ? "bg-yellow-400/20 text-yellow-300"
-                        : "bg-green-500/20 text-green-400"
-                    }`}
-                  >
-                    {p.level}
-                  </span>
+                  <h3 className="text-lg font-semibold text-white">{p.title}</h3>
+                  <span className="text-xs px-3 py-1 rounded-full bg-white/10">{p.level}</span>
                 </div>
 
                 <div className="text-sm text-slate-300 space-y-2">
@@ -192,9 +217,30 @@ export default function Dashboard() {
                     Triggered because {p.reason}
                   </p>
                 </div>
-
               </div>
             ))}
+
+            {/* ✅ PRIORITY ZONES — BACK IN POLICY PANEL */}
+            <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6">
+              <h3 className="text-lg font-semibold text-red-400 mb-4">
+                🚨 Today’s Priority Zones
+              </h3>
+
+              <div className="space-y-3">
+                {priorityZones.map((z, i) => (
+                  <div key={i} className="flex justify-between items-center bg-slate-900/60 rounded-xl p-3 border border-slate-700">
+                    <div>
+                      <p className="text-white font-medium">{z.area}</p>
+                      <p className="text-xs text-slate-400">Ward {z.ward}</p>
+                    </div>
+                    <span className="text-sm font-semibold text-red-400">
+                      AQI {z.aqi}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
 

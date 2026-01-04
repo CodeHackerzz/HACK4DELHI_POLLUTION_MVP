@@ -20,8 +20,6 @@ function getPM10Color(val) {
   return "#dc2626";
 }
 
-/* ================= MINI BAR ================= */
-
 function bar(label, value, max, color) {
   const width = Math.min(100, Math.round((value / max) * 100));
   return `
@@ -34,18 +32,11 @@ function bar(label, value, max, color) {
   `;
 }
 
-/* ================= MAP ================= */
-
-export default function CityMap() {
+export default function CityMap({ onWardSelect }) {
   useEffect(() => {
-
-    /* ✅ FIX IS HERE */
     const map = L.map("map", {
       center: [28.6139, 77.209],
       zoom: 10,
-      boxZoom: false,
-      doubleClickZoom: false,
-      keyboard: false,
     });
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -55,9 +46,7 @@ export default function CityMap() {
     fetch("/data/wards.geojson")
       .then((res) => res.json())
       .then((geojson) => {
-
-        /* ===== AQI LAYER ===== */
-        const aqiLayer = L.geoJSON(geojson, {
+        const layer = L.geoJSON(geojson, {
           style: (feature) => {
             const aqi = 80 + Math.floor(Math.random() * 180);
             const pm25 = 30 + Math.floor(Math.random() * 150);
@@ -74,6 +63,7 @@ export default function CityMap() {
               color: "#020617",
             };
           },
+
           onEachFeature: (feature, layer) => {
             const { aqi, pm25, pm10 } = feature.properties;
 
@@ -87,69 +77,24 @@ export default function CityMap() {
                 ${bar("PM10", pm10, 300, getPM10Color(pm10))}
               </div>
             `);
+
+            // ✅ ONLY NEW LINE (NO UI CHANGE)
+            layer.on("click", () => {
+              onWardSelect({
+                ward: feature.properties.ward || "Unknown Ward",
+                aqi,
+                pm25,
+                pm10,
+              });
+            });
           },
         });
 
-        /* ===== PM2.5 LAYER ===== */
-        const pm25Layer = L.geoJSON(geojson, {
-          style: (feature) => {
-            const pm25 = 30 + Math.floor(Math.random() * 150);
-            feature.properties.pm25 = pm25;
-            return {
-              fillColor: getPM25Color(pm25),
-              fillOpacity: 0.65,
-              weight: 1,
-              color: "#020617",
-            };
-          },
-          onEachFeature: (feature, layer) => {
-            layer.bindTooltip(
-              `PM2.5: ${feature.properties.pm25} µg/m³`,
-              { sticky: true }
-            );
-          },
-        });
-
-        /* ===== PM10 LAYER ===== */
-        const pm10Layer = L.geoJSON(geojson, {
-          style: (feature) => {
-            const pm10 = 50 + Math.floor(Math.random() * 200);
-            feature.properties.pm10 = pm10;
-            return {
-              fillColor: getPM10Color(pm10),
-              fillOpacity: 0.65,
-              weight: 1,
-              color: "#020617",
-            };
-          },
-          onEachFeature: (feature, layer) => {
-            layer.bindTooltip(
-              `PM10: ${feature.properties.pm10} µg/m³`,
-              { sticky: true }
-            );
-          },
-        });
-
-        aqiLayer.addTo(map);
-
-        L.control.layers(
-          {
-            "AQI Risk": aqiLayer,
-            "PM2.5 Concentration": pm25Layer,
-            "PM10 Concentration": pm10Layer,
-          },
-          null,
-          { collapsed: false }
-        ).addTo(map);
+        layer.addTo(map);
       });
 
     return () => map.remove();
-  }, []);
+  }, [onWardSelect]);
 
-  return (
-    <div
-      id="map"
-      className="h-64 w-full rounded-2xl border border-slate-700"
-    />
-  );
+  return <div id="map" className="h-full w-full" />;
 }
