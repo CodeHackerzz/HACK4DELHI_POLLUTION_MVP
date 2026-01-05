@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import CityMap from "../components/CityMap";
 
-/* ================= AQI SEVERITY ENGINE ================= */
 
 function getAQIMeta(aqi) {
   if (aqi <= 50) return { label: "GOOD", glow: "from-green-400 to-green-600" };
@@ -12,7 +11,7 @@ function getAQIMeta(aqi) {
   return { label: "SEVERE", glow: "from-red-900 to-black" };
 }
 
-/* ================= POLICY ENGINE ================= */
+
 
 function generatePolicy(pollution) {
   const policies = [];
@@ -60,7 +59,6 @@ function generatePolicy(pollution) {
   return policies;
 }
 
-/* ================= PRIORITY ZONES ================= */
 
 const priorityZones = [
   { ward: 17, area: "Rohini Sec-16", aqi: 328 },
@@ -68,7 +66,6 @@ const priorityZones = [
   { ward: 29, area: "Janakpuri", aqi: 318 },
 ];
 
-/* ================= CITIZEN ADVISORY ================= */
 
 function getCitizenAdvisory(ward) {
   if (!ward) return [];
@@ -91,7 +88,7 @@ function getCitizenAdvisory(ward) {
   return advice;
 }
 
-/* ================= DASHBOARD ================= */
+
 
 export default function Dashboard() {
   const [pollution, setPollution] = useState({
@@ -130,7 +127,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-black text-white px-10 py-12">
 
-      {/* HEADER */}
+      {}
       <div className="mb-16">
         <p className="text-emerald-400 tracking-widest mb-3 flex items-center gap-2">
           <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
@@ -150,7 +147,7 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* KPI CARDS */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-20">
         <MetricCard title="AQI-Air Quality Index" value={pollution.aqi} unit="" status={aqiMeta.label} glow={aqiMeta.glow} />
         <MetricCard title="PM2.5-Particulate Matter smaller than 2.5" value={pollution.pm25} unit="µg/m³" status="LIVE" glow="from-yellow-400 to-orange-500" />
@@ -158,10 +155,10 @@ export default function Dashboard() {
         <MetricCard title="NO₂-Nitrogen Dioxide" value={pollution.no2} unit="ppb" status="LIVE" glow="from-cyan-400 to-blue-500" />
       </div>
 
-      {/* PANELS */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
-        {/* MAP PANEL */}
+        {}
         <div className="md:col-span-2 rounded-3xl bg-slate-900/60 backdrop-blur-xl p-8 border border-slate-700">
           <h2 className="text-xl font-semibold text-emerald-400 mb-2">
             🗺️ City Digital Twin
@@ -175,7 +172,7 @@ export default function Dashboard() {
             <CityMap onWardSelect={setSelectedWard} />
           </div>
 
-          {/* ✅ ONLY NEW ADDITION */}
+          {}
           {selectedWard && (
             <div className="mt-6 bg-slate-900/60 border border-slate-700 rounded-2xl p-6">
               <h3 className="text-lg font-semibold text-emerald-400 mb-3">
@@ -191,7 +188,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* POLICY INTELLIGENCE — UNCHANGED */}
+        {}
         <div className="rounded-3xl bg-slate-900/60 backdrop-blur-xl p-8 border border-slate-700 flex flex-col">
           <h2 className="text-xl font-semibold text-cyan-400 mb-6">
             🚨 Policy Intelligence
@@ -220,7 +217,7 @@ export default function Dashboard() {
               </div>
             ))}
 
-            {/* ✅ PRIORITY ZONES — BACK IN POLICY PANEL */}
+            {}
             <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6">
               <h3 className="text-lg font-semibold text-red-400 mb-4">
                 🚨 Today’s Priority Zones
@@ -249,7 +246,7 @@ export default function Dashboard() {
   );
 }
 
-/* ================= KPI CARD ================= */
+
 
 function MetricCard({ title, value, unit, status, glow }) {
   return (
