@@ -7,7 +7,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-black text-white overflow-hidden">
 
-      {/* NAVBAR */}
+      {}
       <motion.div
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -19,9 +19,9 @@ export default function Landing() {
         </h1>
 
         <div className="flex items-center gap-6">
-          {/* ❌ About Us REMOVED */}
+          {}
 
-          {/* SIGN UP */}
+          {}
           <button
             onClick={() => navigate("/role")}
             className="px-5 py-2 rounded-xl bg-emerald-500 hover:scale-105 transition font-semibold text-black shadow-lg shadow-emerald-500/30"
@@ -29,7 +29,7 @@ export default function Landing() {
             Sign Up
           </button>
 
-          {/* ✅ LOGIN (HIGHLIGHTED SAME LEVEL) */}
+          {}
           <button
             onClick={() => navigate("/gov-login")}
             className="px-5 py-2 rounded-xl bg-cyan-500 hover:scale-105 transition font-semibold text-black shadow-lg shadow-cyan-500/30"
@@ -39,11 +39,11 @@ export default function Landing() {
         </div>
       </motion.div>
 
-      {/* HERO */}
+      {}
       <div className="flex items-center justify-center min-h-[85vh] px-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
 
-          {/* LEFT TEXT */}
+          {}
           <motion.div
             initial={{ opacity: 0, x: -60 }}
             animate={{ opacity: 1, x: 0 }}
@@ -60,7 +60,7 @@ export default function Landing() {
             </p>
           </motion.div>
 
-          {/* ABOUT US CARD (UNCHANGED) */}
+          {}
           <motion.div
             initial={{ opacity: 0, x: 60 }}
             animate={{ opacity: 1, x: 0 }}
