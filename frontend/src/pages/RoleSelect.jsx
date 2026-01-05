@@ -21,7 +21,7 @@ export default function RoleSelect() {
           Public users can continue directly. Government access requires authorization.
         </p>
 
-        {/* CITIZEN (PRIMARY / DEFAULT) */}
+        {}
         <button
           onClick={() => navigate("/dashboard")}
           className="relative w-full mb-6 py-4 rounded-2xl 
@@ -35,7 +35,7 @@ export default function RoleSelect() {
           </span>
         </button>
 
-        {/* GOVERNMENT (RESTRICTED) */}
+        {}
         <button
           onClick={() => navigate("/gov-login")}
           className="relative w-full py-4 rounded-2xl 
