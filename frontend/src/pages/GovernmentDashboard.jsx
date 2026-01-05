@@ -42,7 +42,7 @@ export default function GovernmentDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-black text-white">
 
-      {/* HEADER */}
+      {}
       <section className="px-12 pt-14 pb-10">
         <motion.h1
           initial={{ opacity: 0, y: -25 }}
@@ -59,7 +59,7 @@ export default function GovernmentDashboard() {
         </p>
       </section>
 
-      {/* KPI CARDS */}
+      {}
       <section className="px-12 grid grid-cols-1 md:grid-cols-4 gap-8 mb-20">
         <Stat title="AQI– Air Quality Index" value={aqi} critical />
         <Stat title="PM2.5-Particulate Matter smaller than 2.5" value={data.pm25} unit="µg/m³" />
@@ -67,7 +67,7 @@ export default function GovernmentDashboard() {
         <Stat title="NO₂-Nitrogen Dioxide" value={data.no2} unit="ppb" />
       </section>
 
-      {/* MAP */}
+      {}
       <section className="px-12 mb-24">
         <GlassPanel title="Ward-Wise Pollution Visualization">
           <div className="h-[480px] rounded-2xl overflow-hidden border border-slate-700">
@@ -76,7 +76,7 @@ export default function GovernmentDashboard() {
         </GlassPanel>
       </section>
 
-      {/* AQI TREND — IMPROVED */}
+      {}
       <section className="px-12 mb-24">
         <GlassPanel title="24-Hour AQI Trend (Readable & Interpretable)">
           <p className="text-sm text-slate-400 mb-4">
@@ -110,7 +110,7 @@ export default function GovernmentDashboard() {
         </GlassPanel>
       </section>
 
-      {/* POLICY ENGINE */}
+      {}
       <section className="px-12 mb-24">
         <div className="bg-gradient-to-br from-red-950/40 via-black to-black border border-red-500/30 rounded-[32px] p-10">
           <h2 className="text-3xl font-bold text-red-400 mb-8">
@@ -126,7 +126,7 @@ export default function GovernmentDashboard() {
         </div>
       </section>
 
-      {/* SYSTEM STATUS */}
+      {}
       <section className="px-12 pb-20">
         <div className="bg-emerald-500/10 border border-emerald-400/30 rounded-[28px] p-8">
           <h3 className="text-xl text-emerald-300 mb-2">
@@ -141,7 +141,7 @@ export default function GovernmentDashboard() {
   );
 }
 
-/* ===== COMPONENTS ===== */
+
 
 function Stat({ title, value, unit, critical }) {
   return (
